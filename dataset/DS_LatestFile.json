@@ -1,0 +1,23 @@
+{
+	"name": "DS_LatestFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLDev1892",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "Destination1",
+				"fileSystem": "outputfiles"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

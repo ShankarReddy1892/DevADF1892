@@ -1,0 +1,28 @@
+{
+	"name": "DS_FLEmployee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLDev1892",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Employee Fixed Length File.txt",
+				"folderPath": "source",
+				"fileSystem": "inputfiles"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

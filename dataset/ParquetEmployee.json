@@ -1,0 +1,21 @@
+{
+	"name": "ParquetEmployee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLDev1892",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "destination",
+				"fileSystem": "outputfiles"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

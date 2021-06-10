@@ -1,0 +1,64 @@
+{
+	"name": "dataflow_SCDType2_Customer",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_CustomerData",
+						"type": "DatasetReference"
+					},
+					"name": "CustomerDataSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "CustomerTableSource",
+						"type": "DatasetReference"
+					},
+					"name": "CustomerTableSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CustomerSink",
+						"type": "DatasetReference"
+					},
+					"name": "CustomerSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "CustomerSink",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "Select1"
+				},
+				{
+					"name": "Lookup1"
+				},
+				{
+					"name": "FilterMatchedRow"
+				},
+				{
+					"name": "Select2"
+				},
+				{
+					"name": "DerivedColumn2"
+				},
+				{
+					"name": "AlterRow1"
+				}
+			],
+			"script": "source(output(\n\t\tCustomerID as integer,\n\t\tCustomerName as string,\n\t\tAddress as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tpurgeFiles: true) ~> CustomerDataSource\nsource(output(\n\t\tSurrKey as integer,\n\t\tCustomerID as integer,\n\t\tCustomerName as string,\n\t\tAddress as string,\n\t\tIsactive as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> CustomerTableSource\nCustomerDataSource derive(ISactive = 1) ~> DerivedColumn1\nCustomerTableSource select(mapColumn(\n\t\tSQL_SurrKey = SurrKey,\n\t\tSQL_CustomerID = CustomerID,\n\t\tSQL_CustomerName = CustomerName,\n\t\tSQL_Address = Address,\n\t\tSQL_Isactive = Isactive\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nCustomerDataSource, Select1 lookup(CustomerID == SQL_CustomerID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 filter(!isNull(SQL_CustomerID)) ~> FilterMatchedRow\nFilterMatchedRow select(mapColumn(\n\t\tSQL_SurrKey,\n\t\tSQL_CustomerID,\n\t\tSQL_CustomerName,\n\t\tSQL_Address,\n\t\tSQL_Isactive\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nSelect2 derive(SQL_Isactive = 0) ~> DerivedColumn2\nDerivedColumn2 alterRow(updateIf(1==1)) ~> AlterRow1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSurrKey as integer,\n\t\tCustomerID as integer,\n\t\tCustomerName as string,\n\t\tAddress as string,\n\t\tIsactive as integer\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 2,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tCustomerID,\n\t\tCustomerName,\n\t\tAddress,\n\t\tIsactive = ISactive\n\t)) ~> CustomerSink\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSurrKey as integer,\n\t\tCustomerID as integer,\n\t\tCustomerName as string,\n\t\tAddress as string,\n\t\tIsactive as integer\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['SurrKey'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tSurrKey = SQL_SurrKey,\n\t\tCustomerID = SQL_CustomerID,\n\t\tCustomerName = SQL_CustomerName,\n\t\tAddress = SQL_Address,\n\t\tIsactive = SQL_Isactive\n\t)) ~> sink1"
+		}
+	}
+}

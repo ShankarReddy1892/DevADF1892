@@ -1,0 +1,9 @@
+{
+	"name": "DevADF1892",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "b67ab239-fda0-4a05-98f7-8df3fe941d7e",
+		"tenantId": "1aaaaf27-6813-4304-9734-615da643ed9a"
+	}
+}

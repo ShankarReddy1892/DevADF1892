@@ -1,0 +1,45 @@
+{
+	"name": "AzureSqlTableFaculty",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase_practice",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "SurrKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FacultyNo",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FacultyName",
+				"type": "varchar"
+			},
+			{
+				"name": "Gender",
+				"type": "varchar"
+			},
+			{
+				"name": "Department",
+				"type": "varchar"
+			},
+			{
+				"name": "isactive",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Faculty"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

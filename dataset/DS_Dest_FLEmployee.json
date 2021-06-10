@@ -1,0 +1,17 @@
+{
+	"name": "DS_Dest_FLEmployee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase_practice",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "SampleEmployee"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

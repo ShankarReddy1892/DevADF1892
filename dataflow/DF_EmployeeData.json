@@ -1,0 +1,32 @@
+{
+	"name": "DF_EmployeeData",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_EmployeeData",
+						"type": "DatasetReference"
+					},
+					"name": "EmployeeDatasource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DeptwiseEmployeeData",
+						"type": "DatasetReference"
+					},
+					"name": "DeptwiseEmployeeData"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Filter1"
+				}
+			],
+			"script": "parameters{\n\tDeptName as string\n}\nsource(output(\n\t\tEmpID as string,\n\t\tEmpName as string,\n\t\tDept as string,\n\t\tSalary as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> EmployeeDatasource\nEmployeeDatasource filter(Dept==$DeptName) ~> Filter1\nFilter1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['DeptwiseEmployeeData.txt'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> DeptwiseEmployeeData"
+		}
+	}
+}

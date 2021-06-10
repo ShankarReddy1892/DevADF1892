@@ -1,0 +1,46 @@
+{
+	"name": "DE_Union",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_ITEmployees",
+						"type": "DatasetReference"
+					},
+					"name": "ITSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_HREmployees",
+						"type": "DatasetReference"
+					},
+					"name": "HRSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "Ds_PayrollEmployees",
+						"type": "DatasetReference"
+					},
+					"name": "PayrollSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_AllEmployeeSink",
+						"type": "DatasetReference"
+					},
+					"name": "AllEmployeesSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AllEmployees"
+				}
+			],
+			"script": "source(output(\n\t\tEmpno as string,\n\t\tEname as string,\n\t\tDeptartment as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ITSource\nsource(output(\n\t\tEmpno as string,\n\t\tEname as string,\n\t\tDeptartment as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> HRSource\nsource(output(\n\t\tEmpno as string,\n\t\tEname as string,\n\t\tDeptartment as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> PayrollSource\nITSource, HRSource, PayrollSource union(byName: true)~> AllEmployees\nAllEmployees sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['AllEmployees.txt'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> AllEmployeesSink"
+		}
+	}
+}

@@ -1,0 +1,61 @@
+{
+	"name": "AzureSqlTable_InsuranceData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase_practice",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Policy",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Expiry Date",
+				"type": "date"
+			},
+			{
+				"name": "Location",
+				"type": "nvarchar"
+			},
+			{
+				"name": "State",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Region",
+				"type": "nvarchar"
+			},
+			{
+				"name": "InsuredValue",
+				"type": "money",
+				"precision": 19,
+				"scale": 4
+			},
+			{
+				"name": "Construction",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BusinessType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Earthquake",
+				"type": "char"
+			},
+			{
+				"name": "Flood",
+				"type": "char"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Insurance Data"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

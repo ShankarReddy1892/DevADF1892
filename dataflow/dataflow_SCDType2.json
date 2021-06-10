@@ -1,0 +1,64 @@
+{
+	"name": "dataflow_SCDType2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_FacultySource",
+						"type": "DatasetReference"
+					},
+					"name": "sourceFaculty"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTableFaculty",
+						"type": "DatasetReference"
+					},
+					"name": "sourceFacultyTable"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SourceAzureSQL_Faculty",
+						"type": "DatasetReference"
+					},
+					"name": "FacultySink"
+				},
+				{
+					"dataset": {
+						"referenceName": "SourceAzureSQL_Faculty",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "ChangeColumnName"
+				},
+				{
+					"name": "Lookup1"
+				},
+				{
+					"name": "FilterFacultyNo"
+				},
+				{
+					"name": "RemoveUnnecesoryColumns"
+				},
+				{
+					"name": "ChangeIsactiveColumn"
+				},
+				{
+					"name": "AlterRow1"
+				}
+			],
+			"script": "source(output(\n\t\tFacultyNo as integer,\n\t\tFacultyName as string,\n\t\tGender as string,\n\t\tDepartment as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tpurgeFiles: true) ~> sourceFaculty\nsource(output(\n\t\tSurrKey as integer,\n\t\tFacultyNo as integer,\n\t\tFacultyName as string,\n\t\tGender as string,\n\t\tDepartment as string,\n\t\tisactive as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceFacultyTable\nsourceFaculty derive(Isactive = 1) ~> DerivedColumn1\nsourceFacultyTable select(mapColumn(\n\t\tSQL_SurrKey = SurrKey,\n\t\tSQL_FacultyNo = FacultyNo,\n\t\tSQL_FacultyName = FacultyName,\n\t\tSQL_Gender = Gender,\n\t\tSQL_Department = Department,\n\t\tSQL_isactive = isactive\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ChangeColumnName\nsourceFaculty, ChangeColumnName lookup(FacultyNo == SQL_FacultyNo,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 filter(!isNull(SQL_FacultyNo)) ~> FilterFacultyNo\nFilterFacultyNo select(mapColumn(\n\t\tSQL_SurrKey,\n\t\tSQL_FacultyNo,\n\t\tSQL_FacultyName,\n\t\tSQL_Gender,\n\t\tSQL_Department,\n\t\tSQL_isactive\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> RemoveUnnecesoryColumns\nRemoveUnnecesoryColumns derive(SQL_isactive = 0) ~> ChangeIsactiveColumn\nChangeIsactiveColumn alterRow(updateIf(1==1)) ~> AlterRow1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSurrKey as integer,\n\t\tFacultyNo as integer,\n\t\tFacultyName as string,\n\t\tGender as string,\n\t\tDepartment as string,\n\t\tisactive as integer\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tFacultyNo,\n\t\tFacultyName,\n\t\tGender,\n\t\tDepartment,\n\t\tisactive = Isactive\n\t)) ~> FacultySink\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSurrKey as integer,\n\t\tFacultyNo as integer,\n\t\tFacultyName as string,\n\t\tGender as string,\n\t\tDepartment as string,\n\t\tisactive as integer\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['SurrKey'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tSurrKey = SQL_SurrKey,\n\t\tFacultyNo = SQL_FacultyNo,\n\t\tFacultyName = SQL_FacultyName,\n\t\tGender = SQL_Gender,\n\t\tDepartment = SQL_Department,\n\t\tisactive = SQL_isactive\n\t)) ~> sink1"
+		}
+	}
+}

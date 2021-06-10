@@ -1,0 +1,27 @@
+{
+	"name": "DS_DynamicFolder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLDev1892",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@Concat(formatDateTime(utcnow(),'YYYY'),'/',formatDateTime(utcnow(),'MM'),'/',formatDateTime(utcnow(),'DD'),'/')",
+					"type": "Expression"
+				},
+				"fileSystem": "outputfiles"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

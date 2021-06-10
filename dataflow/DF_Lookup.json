@@ -1,0 +1,42 @@
+{
+	"name": "DF_Lookup",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Employee_Lookup",
+						"type": "DatasetReference"
+					},
+					"name": "sourceEmployee"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Dept_Lookup",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDept"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_Employye_Lookup_Dept",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "EmployeeLookupDept"
+				},
+				{
+					"name": "Select1"
+				}
+			],
+			"script": "source(output(\n\t\tEmpID as string,\n\t\tEmpName as string,\n\t\tDept as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> sourceEmployee\nsource(output(\n\t\tDepartmentID as string,\n\t\tDepartmentName as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> sourceDept\nsourceEmployee, sourceDept lookup(Dept == DepartmentID,\n\tmultiple: false,\n\tpickup: 'any',\n\tpartitionBy('hash', 1),\n\tbroadcast: 'auto')~> EmployeeLookupDept\nEmployeeLookupDept select(mapColumn(\n\t\tEmpID,\n\t\tEmpName,\n\t\tDepartmentName\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['LookupData.txt'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> sink1"
+		}
+	}
+}

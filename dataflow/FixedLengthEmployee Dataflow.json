@@ -1,0 +1,38 @@
+{
+	"name": "FixedLengthEmployee Dataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_FLEmployee",
+						"type": "DatasetReference"
+					},
+					"name": "FLEmployeeFiles"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_Dest_FLEmployee",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "Select1"
+				},
+				{
+					"name": "DerivedColumn2"
+				}
+			],
+			"script": "source(output(\n\t\tColumn_1 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FLEmployeeFiles\nFLEmployeeFiles derive(EmployeeID = substring(Column_1, 1, 4),\n\t\tEmployeeName = substring(Column_1, 5, 10),\n\t\tState = substring(Column_1, 15, 2),\n\t\tMobileNumber = substring(Column_1, 17, 10)) ~> DerivedColumn1\nDerivedColumn1 select(mapColumn(\n\t\tEmployeeID,\n\t\tEmployeeName,\n\t\tState,\n\t\tMobileNumber\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 derive(EmployeeID = toInteger(EmployeeID)) ~> DerivedColumn2\nDerivedColumn2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+		}
+	}
+}
